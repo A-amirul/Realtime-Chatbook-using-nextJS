@@ -1,10 +1,41 @@
+"use client"
 import Image from 'next/image';
 import logo from "../public/assets/logo.png"
 import React from 'react';
 import { EmailOutlined, LockOutlined, PersonOutline } from '@mui/icons-material';
 import Link from 'next/link';
+import { useForm } from 'react-hook-form';
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const Form = ({ type }) => {
+	const {
+		register,
+		handleSubmit,
+		watch,
+		formState: { errors },
+	} = useForm();
+
+	const router = useRouter();
+
+	const onSubmit = async (data) => { 
+		if (type === "register") {
+			const res = await fetch("/api/auth/register", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(data),
+			});
+			if (res.ok) {
+				router.push("/");
+			}
+			if (res.error) {
+				toast.error("Something Went Wrong");
+			}
+		}
+	 }
+	
 	return (
 		<div className='auth'>
 			<div className="content">
@@ -14,24 +45,64 @@ const Form = ({ type }) => {
 					className='logo'
 				/>
 
-				<form className="form">
+				<form onSubmit={handleSubmit(onSubmit)} className="form">
 					{
 						type === "register" && (
-							<div className='input'>
-								<input type='text' placeholder='Username' className='input-field' />
-								<PersonOutline sx={{ color: "#737373" }} />
+							<div>
+								<div className='input'>
+									<input
+										{...register("username", {
+											required: "Username is required",
+											validate: (value) => {
+												if (value.length < 3) {
+													return "Username must be at least 3 characters"
+												}
+											},
+										})}
+										defaultValue=""
+										type='text' placeholder='Username' className='input-field' />
+									<PersonOutline sx={{ color: "#737373" }} />
+								</div>
+								{errors.username && (
+									<p className='text-red-500'>{errors?.username?.message}</p>
+								)}
 							</div>
 						)
 					}
 
-					<div className='input'>
-						<input type='email' placeholder='Email' className='input-field' />
-						<EmailOutlined sx={{ color: "#737373" }} />
+					<div>
+						<div className='input'>
+							<input
+								defaultValue=""
+								{...register("email", { required: "Email is required" })} type='email' placeholder='Email' className='input-field' />
+							<EmailOutlined sx={{ color: "#737373" }} />
+						</div>
+						{errors.email && (
+							<p className='text-red-500'>{errors?.email?.message}</p>
+						)}
+
 					</div>
-					<div className='input'>
-						<input type='password' placeholder='Password' className='input-field' />
-						<LockOutlined sx={{ color: "#737373" }} />
+
+					<div>
+						<div className='input'>
+							<input
+								defaultValue=""
+								{...register("password", {
+									required: "Password is required",
+									validate: (value) => {
+										if (value.length < 5 || !value.match(/[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/)) {
+											return "Password must be at least 5 characters and contain at least 1 special character"
+										}
+									},
+								})} type='password' placeholder='Password' className='input-field' />
+							<LockOutlined sx={{ color: "#737373" }} />
+						</div>
+						{errors.password && (
+							<p className='text-red-500'>{errors?.password?.message}</p>
+						)}
+
 					</div>
+
 
 					<button className='button' type='submit'>
 						{
@@ -41,8 +112,12 @@ const Form = ({ type }) => {
 
 				</form>
 				{
-					// eslint-disable-next-line react/no-unescaped-entities
-					type === "register" ? <Link href="/" className='link'><p className='text-center'>Already Have an Account?</p>Sign In Here</Link> : <Link href="/register" className='link'><p className='text-center'> Don't Have an Account?</p>Register Here</Link>
+
+					type === "register" ? <Link href="/" className="link">
+						<p className="text-center">Already have an account? Sign In Here</p>
+					</Link> : <Link href="/register" className="link">
+						<p className="text-center">Don't have an account? Register Here</p>
+					</Link>
 				}
 
 			</div>
