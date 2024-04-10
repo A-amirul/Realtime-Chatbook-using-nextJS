@@ -19,7 +19,7 @@ const TopBar = () => {
 	return (
 		<div className="topbar">
 			<Link href="/chats">
-				<Image
+				<img
 					src={logo}
 					alt="logo"
 					className='logo'
@@ -31,7 +31,7 @@ const TopBar = () => {
 				<Link href="/contacts" className={`${pathname === "/contacts" ? "text-red-1"
 					: ""} text-heading4-bold`}>Contacts</Link>
 				<Logout sx={{ color: "#737373", cursor: "pointer" }} onClick={handleLogout} />
-				<Link href="/profile"><Image src={user?.profileImage || profileImage} alt="profile" className="profilePhoto" />
+				<Link href="/profile"><img src={user?.profileImage || profileImage} alt="profile" className="profilePhoto" />
 				</Link>
 			</div>
 

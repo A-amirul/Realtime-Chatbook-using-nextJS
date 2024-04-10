@@ -54,7 +54,7 @@ const Form = ({ type }) => {
 	return (
 		<div className='auth'>
 			<div className="content">
-				<Image
+				<img
 					src={logo}
 					alt="logo"
 					className='logo'
